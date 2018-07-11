@@ -24,7 +24,11 @@ namespace AzureQueueStorage
 
             // Create the queue if it doesn't already exist
             queue.CreateIfNotExists();
+            // Peek at the next message
+            CloudQueueMessage peekedMessage = queue.PeekMessage();
 
+            // Display message.
+            Console.WriteLine(peekedMessage.AsString);
             // Create a message and add it to the queue.
             for (int i = 0; i < 10; i++)
             {
@@ -37,8 +41,12 @@ namespace AzureQueueStorage
             foreach (var item in temp)
             {
                 Console.WriteLine(item.AsString);
-            } 
-           
+                queue.DeleteMessageAsync(item);
+                // Async delete the message
+                Console.WriteLine("Deleted message");
+            }
+
+
             Console.ReadLine();
         }
     }
