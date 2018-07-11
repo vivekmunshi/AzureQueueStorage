@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Queue;
 
 namespace AzureQueueStorage
 {
@@ -13,6 +13,33 @@ namespace AzureQueueStorage
     {
         static void Main(string[] args)
         {
+            // Parse the connection string and return a reference to the storage account.
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
+                CloudConfigurationManager.GetSetting("StorageConnectionString"));
+            CloudQueueClient queueClient = storageAccount.CreateCloudQueueClient();
+
+
+            // Retrieve a reference to a container.
+            CloudQueue queue = queueClient.GetQueueReference("myqueue");
+
+            // Create the queue if it doesn't already exist
+            queue.CreateIfNotExists();
+
+            // Create a message and add it to the queue.
+            for (int i = 0; i < 10; i++)
+            {
+                CloudQueueMessage message = new CloudQueueMessage("Hello, World"+i);
+                queue.AddMessage(message);
+            }
+
+            var temp = queue.GetMessages(30);
+            // Display message.
+            foreach (var item in temp)
+            {
+                Console.WriteLine(item.AsString);
+            } 
+           
+            Console.ReadLine();
         }
     }
 }
